@@ -1,3 +1,25 @@
+proc html-string {} {
+	global html
+	global wapp
+	if [info exists wapp] {
+		return [dict get $wapp .reply]
+	}
+	if [info exists html] {
+		return $html
+	}
+	return ""
+}
+
+proc html-append {string} {
+	global html
+	global wapp
+	if [info exists wapp] {
+		dict append wapp .reply $string
+	} else {
+		append html $string
+	}
+}
+
 proc html {tag args} {
 	global wapp
 
@@ -35,22 +57,22 @@ proc html {tag args} {
 		{} {}
 		{default} {
 			# Maybe Append Newline
-			switch [string index [dict get $wapp .reply] end] {
+			switch [string index [html-string] end] {
 				{} {}
 				\n {}
 				default {
-					dict append wapp .reply \n
+					html-append \n
 				}
 			}
 			# Append the actual Tag
-			dict append wapp .reply <$tag$attributes>
+			html-append <$tag$attributes>
 		}
 	}
 	# Process Special Attributes
 	foreach {name value} $args {
 		switch $name {
-			{html} { dict append wapp .reply $value }
-			{text} { dict append wapp .reply [string map {< &lt;} $value] }
+			{html} { html-append $value }
+			{text} { html-append [string map {< &lt;} $value] }
 			{body} { uplevel 1 $value }
 		}
 	}
@@ -72,7 +94,7 @@ proc html {tag args} {
 		{track} {}
 		{wbr} {}
 		{default} {
-			dict append wapp .reply </$tag>\n
+			html-append </$tag>\n
 		}
 	}
 }
