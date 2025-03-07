@@ -1,0 +1,4 @@
+Small html generator for the tcl programming language.
+Currently works only with Dr. Richard Hipp's wapp
+web application framework.
+
